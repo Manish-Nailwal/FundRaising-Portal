@@ -12,5 +12,6 @@ export default defineConfig({
         target: 'http://localhost:5000', // Your backend's local address
         changeOrigin: true,
       },
+    },
   },
 })
