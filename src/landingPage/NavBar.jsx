@@ -36,10 +36,10 @@ function NavBar() {
     verifyCookies();
   }, [cookies, navigate, removeCookie]);
 
-  const Logout = () => {
+  const Logout = async() => {
     setStatus(false);
     setIsLogin(false);
-    removeCookie("token");
+    await removeCookie("token");
     setTimeout(() => {
       window.location.href = "/";
     }, 100);
