@@ -36,14 +36,25 @@ function NavBar() {
     verifyCookies();
   }, [cookies, navigate, removeCookie]);
 
-  const Logout = async() => {
-    setStatus(false);
-    setIsLogin(false);
-    await removeCookie("token");
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 100);
-  };
+  // const Logout = async() => {
+  //   setStatus(false);
+  //   setIsLogin(false);
+  //   await removeCookie("token");
+  //   setTimeout(() => {
+  //     window.location.href = "/";
+  //   }, 100);
+  // };
+
+  const Logout = async () => {
+  setStatus(false);
+  setIsLogin(false);
+
+  await removeCookie("token");
+  localStorage.clear();
+  sessionStorage.clear();
+
+  window.location.replace("/");
+};
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top">
