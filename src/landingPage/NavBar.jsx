@@ -17,7 +17,7 @@ function NavBar() {
   });
   useEffect(() => {
     const verifyCookies = async () => {
-      if (cookies.token) {
+      // if (cookies.token) {
         const { data } = await axios.post(
           `${backendDomain}/auth`,
           {},
@@ -32,7 +32,7 @@ function NavBar() {
           removeCookie("token");
         }
       }
-    };
+    // };
     verifyCookies();
   }, [cookies, navigate, removeCookie]);
 
