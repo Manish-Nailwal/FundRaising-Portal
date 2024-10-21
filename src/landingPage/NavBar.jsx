@@ -46,15 +46,16 @@ function NavBar() {
   // };
 
   const Logout = async () => {
-  setStatus(false);
-  setIsLogin(false);
+    await axios.post(`${backendDomain}/logout`, {}, { withCredentials: true });
+    setStatus(false);
+    setIsLogin(false);
 
-  await removeCookie("token");
-  localStorage.clear();
-  sessionStorage.clear();
+    await removeCookie("token");
+    localStorage.clear();
+    sessionStorage.clear();
 
-  window.location.replace("/");
-};
+    window.location.replace("/");
+  };
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top">
