@@ -1,59 +1,39 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 function NavBar() {
   const backendDomain =
     import.meta.env.VITE_BACK_END || `http://localhost:3001`;
   const navigate = useNavigate();
-  const [cookies, removeCookie] = useCookies([]);
-  const [status, setStatus] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const [currUser, setCurrUser] = useState({
     name: "User",
     role: "",
     id: "",
   });
+  const token = localStorage.getItem('token');
   useEffect(() => {
-    const verifyCookies = async () => {
-      // if (cookies.token) {
-        const { data } = await axios.post(
-          `${backendDomain}/auth`,
-          {},
-          { withCredentials: true }
-        );
-        const { status, user } = data;
-        if (status) {
-          setIsLogin(true);
-          setStatus(status);
-          setCurrUser({ name: user.name, id: user._id, role: user.role });
-        } else {
-          removeCookie("token");
-        }
+    const verifyCookie = async () => {
+      if (!token) {
+        setIsLogin(false);
       }
-    // };
-    verifyCookies();
-  }, [cookies, navigate, removeCookie]);
+      const { data } = await axios.post(
+        `${backendDomain}/auth`,
+        {token},
+        { withCredentials: true }
+      );
+      const { status, user } = data;
+      return status
+        ? (setIsLogin(true), setCurrUser({ name: user.name, id: user._id, role: user.role }))
+        : (localStorage.removeItem("token"));
+    };
+    verifyCookie();
+  }, [navigate]);
 
-  // const Logout = async() => {
-  //   setStatus(false);
-  //   setIsLogin(false);
-  //   await removeCookie("token");
-  //   setTimeout(() => {
-  //     window.location.href = "/";
-  //   }, 100);
-  // };
-
-  const Logout = async () => {
-    await axios.post(`${backendDomain}/logout`, {}, { withCredentials: true });
-    setStatus(false);
+  const Logout = () => {
+    localStorage.removeItem("token");
     setIsLogin(false);
-
-    await removeCookie("token");
-    localStorage.clear();
-    sessionStorage.clear();
-
     window.location.replace("/");
   };
   return (

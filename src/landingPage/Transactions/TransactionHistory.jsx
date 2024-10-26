@@ -13,31 +13,27 @@ function TransactionHistory() {
     role: "",
     id: ''
   });
+  const token = localStorage.getItem('token');
   useEffect(() => {
-    const verifyCookies = async () => {
+    const verifyCookie = async () => {
+      if (!token) {
+        setStatus(false);
+      }
       const { data } = await axios.post(
         `${backendDomain}/auth`,
-        {},
+        {token},
         { withCredentials: true }
       );
       const { status, user } = data;
-      if(id!==user._id){
-        navigate('/')
-        }
-      if (status) {
-        setStatus(status);
-        setCurrUser({ role: user.role,id: user._id });
-        
-      }else{
-        removeCookie("token");
-        navigate('/login')
-      }
+      return status
+        ? setCurrUser({ role: user.role,id: user._id })
+        : (localStorage.removeItem("token"), navigate("/login"));
     };
-    verifyCookies();
+    verifyCookie();
     axios.get(`${backendDomain}/donate/transactions/${id}`).then((res) => {
       setData(res.data);
     });
-  }, [cookies, removeCookie, navigate]);
+  }, [navigate]);
   return (
     <>
       <div className="container-fluid p-5">

@@ -3,12 +3,11 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ShareBtn from "./ShareBtn";
 import { Link } from "react-router-dom";
-import { useCookies } from "react-cookie"; 
 function FundInfo({}) {
   const [copied, setCopied] = useState(false);
   const [textToCopy, setTextToCopy] = useState("");
   const backendDomain = import.meta.env.VITE_BACK_END || `http://localhost:3001`;
-
+  const [status, setStatus] = useState(true);
   const [data, setData] = useState({
     fundName: "",
     fundRaiser: "",
@@ -19,31 +18,31 @@ function FundInfo({}) {
   });
 
   const fundId = useParams();
-  const [cookies, removeCookie] = useCookies([]);
-  const [status, setStatus] = useState(false);
   const [currUser, setCurrUser] = useState({
     id: ''
   });
-  useEffect( () => {
-    const verifyCookies = async ()=>{
-      const { data } = await axios
-      .post(`${backendDomain}/auth`, {}, { withCredentials: true });
+  const token = localStorage.getItem('token');
+  useEffect(() => {
+    const verifyCookie = async () => {
+      if (!token) {
+        setStatus(false);
+      }
+      const { data } = await axios.post(
+        `${backendDomain}/auth`,
+        {token},
+        { withCredentials: true }
+      );
       const { status, user } = data;
-
-      if(status){
-        setStatus(status);
-      setCurrUser({id: user._id});
-      }
-      if(!status){
-        removeCookie("token");
-      }
-    }
-    verifyCookies();
+      return status
+        ? (setCurrUser({id: user._id.toString()}), setStatus(status))
+        : (localStorage.removeItem("token"));
+    };
+    verifyCookie();
     axios.get(`${backendDomain}/getfundInfo/${fundId.id}`).then((res) => {
       setData({ ...res.data });
       setTextToCopy(`${domain}/fund/${fundId.id}`);
     });
-  }, [cookies, removeCookie]);
+  });
 
   let handleCopy = () => {
     navigator.clipboard
@@ -86,10 +85,12 @@ function FundInfo({}) {
               </p>
             </h6>
 
-           {(currUser.id!==data.owner)?  <Link className="btn btn-primary mt-4 me-3" to={`/donate/${fundId.id}`} >
+           {(status) ? ((currUser.id!==data.owner)?  <Link className="btn btn-primary mt-4 me-3" to={`/donate/${fundId.id}`} >
                 Donate
-              </Link> : <></>}
-            <div className="mt-4">
+              </Link> : <></>):<Link className="btn btn-primary mt-4 me-3" to={`/login`} >
+                Donate
+              </Link>}
+            <div>
               <button className="btn btn-secondary me-3 my-4" onClick={handleCopy}>
                 {copied ? "Copied!" : "Copy Donation Link"}
               </button>

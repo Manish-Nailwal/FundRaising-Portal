@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css";
 import { Link } from "react-router-dom";
-import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 function Common() {
   const backendDomain = import.meta.env.VITE_BACK_END || `http://localhost:3001`;
   const navigate = useNavigate();
-  const [cookies, removeCookie] = useCookies([]);
   const [status, setStatus] = useState(false);
   const [currUser, setCurrUser] = useState({
     name: "User",
@@ -17,22 +15,32 @@ function Common() {
     country: "",
     password: "",
   });
-  useEffect( () => {
-    const verifyCookies = async ()=>{
-      const { data } = await axios
-      .post(`${backendDomain}/auth`, {}, { withCredentials: true });
+  const token = localStorage.getItem('token');
+  useEffect(() => {
+    const verifyCookie = async () => {
+      if (!token) {
+        setStatus(false);
+        return
+      }
+      const { data } = await axios.post(
+        `${backendDomain}/auth`,
+        {token},
+        { withCredentials: true }
+      );
       const { status, user } = data;
-
-      if(status){
-        setStatus(status);
-      setCurrUser({...user});
-      }
-      if(!status){
-        removeCookie("token");
-      }
-    }
-    verifyCookies();
-  }, [cookies, navigate, removeCookie]);
+      return status
+        ? (setStatus(status), setCurrUser({...user}))
+        : (localStorage.removeItem("token"), setCurrUser({
+          name: "User",
+          mail: "",
+          role: "",
+          state: "",
+          country: "",
+          password: "",
+        }));
+    };
+    verifyCookie();
+  });
   return (
     <>
       <div>

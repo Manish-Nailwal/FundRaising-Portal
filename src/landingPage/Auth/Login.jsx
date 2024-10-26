@@ -4,45 +4,57 @@ import Button from "@mui/material/Button";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 function Login() {
   const backendDomain = import.meta.env.VITE_BACK_END || `http://localhost:3001`;
     const navigate = useNavigate();
-  const [data, setData] = useState({
+  const [inputValue, setInputValue] = useState({
     mail: "",
     password: "",
   });
-  let handleClick = ()=>{
-    console.log(test);
-  }
 
   let updateData = (event) => {
-    setData((currData) => {
+    setInputValue((currData) => {
       return { ...currData, [event.target.name]: event.target.value };
     });
   };
-  const handleError = (err) =>{
-    console.log(err);
-  }
-  let handleSubmit = (event) => {
-    event.preventDefault(); 
-    axios.post(`${backendDomain}/login`, { data },
-      { withCredentials: true }).then((res)=>{
-      if (res.data.success) {
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      } else {
-        handleError(res.data.message);
-      }
-    }).catch(err=>{
-      console.log(err)
-    })
-    setData({
-        mail: "",
-        password: "",
+  const handleError = (err) =>
+    toast.error(err, {
+      position: "bottom-left",
     });
-
-  };
+    const handleSuccess = (msg, token) =>{
+      localStorage.setItem('token', token)
+      toast.success(msg, {
+        position: "bottom-left",
+      });
+    }
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          const { data } = await axios.post(
+            `${backendDomain}/login`,
+            {
+              inputValue,
+            },
+            { withCredentials: true }
+          );
+          const { success, message, token } = data;
+          if (success) {
+            handleSuccess(message, token);
+            setTimeout(() => {
+              window.location.replace("/");
+            }, 1000);
+          } else {
+            handleError(message);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+        setInputValue({
+          email: "",
+          password: "",
+        });
+      };
 
   return (
     <>
@@ -57,7 +69,7 @@ function Login() {
               name="mail"
               variant="outlined"
               type="email"
-              value={data.mail}
+              value={inputValue.mail}
               onChange={updateData}
             />
             <TextField
@@ -66,7 +78,7 @@ function Login() {
               variant="outlined"
               name="password"
               type="password"
-              value={data.password}
+              value={inputValue.password}
               onChange={updateData}
             /> 
             <Button variant="contained" className="col-2 mt-4" type="Submit">
@@ -75,6 +87,7 @@ function Login() {
             <p className="mt-4" style={{padding: '0', margin: '0'}}>Create new account <Link to={"/signup"}>Signup</Link></p>
           </form>
         </div>
+        
       </div>
     </>
   );

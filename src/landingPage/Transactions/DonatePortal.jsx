@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { useCookies } from "react-cookie";
 import Button from "@mui/material/Button";
 import axios from "axios";
+import { Link } from "react-router-dom";
 function DonatePortal() {
   const backendDomain = import.meta.env.VITE_BACK_END || `http://localhost:3001`;
+  const [status,setStatus] = useState(true)
   const { id } = useParams();
   const navigate = useNavigate();
-  const [cookies, removeCookie] = useCookies([]);
-  const [status, setStatus] = useState(false);
   const [currUser, setCurrUser] = useState({
     name: "",
     senderId:'',
@@ -23,28 +22,27 @@ function DonatePortal() {
     totalGoal: 0,
     description: "",
   });
+    const token = localStorage.getItem('token');
   useEffect(() => {
-    const verifyCookies = async () => {
+    const verifyCookie = async () => {
+      if (!token) {
+        setStatus(false);
+      }
       const { data } = await axios.post(
         `${backendDomain}/auth`,
-        {},
+        {token},
         { withCredentials: true }
       );
       const { status, user } = data;
-
-      if (!status) {
-        removeCookie("token");
-        navigate("/login");
-      } else {
-        setStatus(status);
-        setCurrUser({name: user.name,senderId: user._id})
-      }
+      return status
+        ? (setCurrUser({name: user.name,senderId: user._id}),setStatus(status))
+        : (localStorage.removeItem("token"));
     };
-    verifyCookies();
+    verifyCookie();
     axios.get(`${backendDomain}/getfundInfo/${id}`).then((res) => {
       setData({ ...res.data });
     });
-  }, [cookies, navigate, removeCookie]);
+  }, [navigate]);
   let updateData = (event) => {
     setCurrUser((currData) => {
       return { ...currData, [event.target.name]: event.target.value };
@@ -126,9 +124,11 @@ function DonatePortal() {
                 variant="outlined"
                 required
               />
-              <Button variant="contained" className="col-2 mt-4" type="Submit">
+              {status ? <Button variant="contained" className="col-2 mt-4" type="Submit">
               Donate
-            </Button>
+            </Button> :<Link className="btn btn-primary mt-4 me-3 col-2" to={`/login`} >
+                Donate
+              </Link>}
             </form>
             <div className="mt-4"></div>
           </div>

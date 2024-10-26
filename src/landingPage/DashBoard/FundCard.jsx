@@ -6,35 +6,35 @@ import CardActions from "@mui/material/CardActions";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useCookies } from "react-cookie"; 
 
 
 function FundCard({ funds }) {
   const backendDomain = import.meta.env.VITE_BACK_END || `http://localhost:3001`;
-  const [cookies, removeCookie] = useCookies([]);
-  const [status, setStatus] = useState(false);
   const [currUser, setCurrUser] = useState({
     id: ''
   });
-  useEffect( () => {
-    const verifyCookies = async ()=>{
-      const { data } = await axios
-      .post(`${backendDomain}/auth`, {}, { withCredentials: true });
+  const [status,setStatus] = useState(true);
+  const token = localStorage.getItem('token');
+  useEffect(() => {
+    const verifyCookie = async () => {
+      if (!token) {
+        setStatus(false);
+      }
+      const { data } = await axios.post(
+        `${backendDomain}/auth`,
+        {token},
+        { withCredentials: true }
+      );
       const { status, user } = data;
-
-      if(status){
-        setStatus(status);
-      setCurrUser({id: user._id});
-      }
-      if(!status){
-        removeCookie("token");
-      }
-    }
-    verifyCookies();
-  }, [cookies, removeCookie]);
+      return status
+        ? (setCurrUser({id: user._id.toString()}), setStatus(status))
+        : (localStorage.removeItem("token"));
+    };
+    verifyCookie();
+  });
 
   
-  const domain = "http://localhost:5173";
+  const domain = import.meta.env.VITE_DOMAIN || "http://localhost:5173";
   let handleShare = (el) => {
     let sharedText = `Hey everyone!
 

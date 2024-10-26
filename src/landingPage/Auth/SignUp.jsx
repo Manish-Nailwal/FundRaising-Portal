@@ -8,10 +8,12 @@ import FormControl from "@mui/material/FormControl";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 function SignUp() {
-  const backendDomain = import.meta.env.VITE_BACK_END || `http://localhost:3001`;
+  const backendDomain =
+    import.meta.env.VITE_BACK_END || `http://localhost:3001`;
   const navigate = useNavigate();
-  const [data, setData] = useState({
+  const [inputValue, setInputValue] = useState({
     name: "",
     mail: "",
     role: "",
@@ -21,37 +23,45 @@ function SignUp() {
   });
 
   let updateData = (event) => {
-    setData((currData) => {
+    setInputValue((currData) => {
       return { ...currData, [event.target.name]: event.target.value };
     });
   };
 
-  const handleError = (err) => {
-    console.log(err);
+  const handleError = (err) =>
+    toast.error(err, {
+      position: "bottom-left",
+    });
+  const handleSuccess = (msg, token) => {
+    localStorage.setItem("token", token);
+    toast.success(msg, {
+      position: "bottom-right",
+    });
   };
-  let handleSubmit = async (event) => {
-    event.preventDefault();
-    await axios.post(
-      `${backendDomain}/signup`,
-      { data },
-      { withCredentials: true }
-    );
-    
-    await axios
-      .post(`${backendDomain}/login`, { data:{mail: data.mail,password: data.password} }, { withCredentials: true })
-      .then((res) => {
-        if (res.data.success) {
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
-        } else {
-          handleError(res.data.Buttonmessage);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    setData({
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(
+        "http://localhost:4000/signup",
+        {
+          inputValue,
+        },
+        { withCredentials: true }
+      );
+      const { success, message, token } = data;
+      if (success) {
+        handleSuccess(message, token);
+        setTimeout(() => {
+          navigate("/");
+        }, 500);
+      } else {
+        handleError(message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setInputValue({
       name: "",
       mail: "",
       role: "",
@@ -72,7 +82,7 @@ function SignUp() {
               label="User Name"
               name="name"
               variant="outlined"
-              value={data.name}
+              value={inputValue.name}
               onChange={updateData}
             />
             <div
@@ -83,7 +93,7 @@ function SignUp() {
                 <InputLabel id="role-label">Role</InputLabel>
                 <Select
                   labelId="role-label"
-                  value={data.role}
+                  value={inputValue.role}
                   label="Role"
                   name="role"
                   onChange={updateData}
@@ -100,7 +110,7 @@ function SignUp() {
               name="mail"
               variant="outlined"
               type="email"
-              value={data.mail}
+              value={inputValue.mail}
               onChange={updateData}
             />
             <TextField
@@ -109,7 +119,7 @@ function SignUp() {
               variant="outlined"
               name="password"
               type="password"
-              value={data.password}
+              value={inputValue.password}
               onChange={updateData}
             />
             <TextField
@@ -117,7 +127,7 @@ function SignUp() {
               label="State"
               name="state"
               variant="outlined"
-              value={data.state}
+              value={inputValue.state}
               onChange={updateData}
             />
             <TextField
@@ -125,7 +135,7 @@ function SignUp() {
               label="Country"
               variant="outlined"
               name="country"
-              value={data.country}
+              value={inputValue.country}
               onChange={updateData}
             />
             <Button variant="contained" className="col-2 mt-4" type="Submit">
@@ -136,6 +146,7 @@ function SignUp() {
             </p>
           </form>
         </div>
+        <ToastContainer />
       </div>
     </>
   );
