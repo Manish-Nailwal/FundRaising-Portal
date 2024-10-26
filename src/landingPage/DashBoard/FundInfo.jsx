@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import ShareBtn from "./ShareBtn";
 import { Link } from "react-router-dom";
 function FundInfo({}) {
+  const domain = import.meta.env.VITE_DOMAIN|| `http://localhost:5173`;
   const [copied, setCopied] = useState(false);
   const [textToCopy, setTextToCopy] = useState("");
   const backendDomain = import.meta.env.VITE_BACK_END || `http://localhost:3001`;
