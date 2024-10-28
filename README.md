@@ -44,15 +44,21 @@ To run the frontend application locally, follow these steps:
    ```bash
    npm install
    ```
-
-4. **Start the application:**
+   
+4. **Create a `.env` file** in the root directory and add the following variables:
+   ```
+   VITE_BACK_END=http://localhost:4000
+   VITE_DOMAIN=http://localhost:3000
+   ```
+   
+5. **Start the application:**
    ```bash
    npm run dev
    ```
 
-5. **Open your browser and navigate to:**
+6. **Open your browser and navigate to:**
    ```
-   http://localhost:5173
+   http://localhost:3000
    ```
 
 ## Project Structure
