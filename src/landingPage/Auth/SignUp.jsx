@@ -21,7 +21,7 @@ function SignUp() {
     country: "",
     password: "",
   });
-
+  const [isSubmitting, setIsSubmitting] = useState(false)
   let updateData = (event) => {
     setInputValue((currData) => {
       return { ...currData, [event.target.name]: event.target.value };
@@ -41,6 +41,7 @@ function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       const { data } = await axios.post(
         `${backendDomain}/signup`,
@@ -57,9 +58,11 @@ function SignUp() {
         }, 500);
       } else {
         handleError(message);
+        setIsSubmitting(false);
       }
     } catch (error) {
       console.log(error);
+      setIsSubmitting(false);
     }
     setInputValue({
       name: "",
@@ -84,6 +87,7 @@ function SignUp() {
               variant="outlined"
               value={inputValue.name}
               onChange={updateData}
+              required
             />
             <div
               className="col-sm-12 col-md-5 mt-4 ms-lg-5"
@@ -97,6 +101,7 @@ function SignUp() {
                   label="Role"
                   name="role"
                   onChange={updateData}
+                  required
                 >
                   <MenuItem value={"Donator"}>Donator</MenuItem>
                   <MenuItem value={"Fund Raiser"}>Fund Raiser</MenuItem>
@@ -112,6 +117,7 @@ function SignUp() {
               type="email"
               value={inputValue.mail}
               onChange={updateData}
+              required
             />
             <TextField
               className="col-sm-12 col-md-5  mt-4 ms-lg-5"
@@ -121,6 +127,7 @@ function SignUp() {
               type="password"
               value={inputValue.password}
               onChange={updateData}
+              required
             />
             <TextField
               className="col-sm-12 col-md-5 mt-4 me-md-5"
@@ -129,6 +136,7 @@ function SignUp() {
               variant="outlined"
               value={inputValue.state}
               onChange={updateData}
+              required
             />
             <TextField
               className="col-sm-12 col-md-5  mt-4 ms-lg-5"
@@ -137,16 +145,16 @@ function SignUp() {
               name="country"
               value={inputValue.country}
               onChange={updateData}
+              required
             />
             <Button variant="contained" className="col-2 mt-4" type="Submit">
-              SignUp
+            {isSubmitting ? 'Getting you set up...' : 'Create Account'}
             </Button>
             <p className="mt-4" style={{ padding: "0", margin: "0" }}>
               Already have an account? <Link to={"/login"}>Login</Link>
             </p>
           </form>
         </div>
-        <ToastContainer />
       </div>
     </>
   );

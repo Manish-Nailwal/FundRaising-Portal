@@ -12,7 +12,7 @@ function Login() {
     mail: "",
     password: "",
   });
-
+  const [isSubmitting, setIsSubmitting] = useState(false)
   let updateData = (event) => {
     setInputValue((currData) => {
       return { ...currData, [event.target.name]: event.target.value };
@@ -30,6 +30,7 @@ function Login() {
     }
       const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         try {
           const { data } = await axios.post(
             `${backendDomain}/login`,
@@ -46,9 +47,11 @@ function Login() {
             }, 1000);
           } else {
             handleError(message);
+            setIsSubmitting(false);
           }
         } catch (error) {
           console.log(error);
+          setIsSubmitting(false);
         }
         setInputValue({
           email: "",
@@ -81,8 +84,8 @@ function Login() {
               value={inputValue.password}
               onChange={updateData}
             /> 
-            <Button variant="contained" className="col-2 mt-4" type="Submit">
-              Login
+            <Button variant="contained" className="col-2 mt-4" type="Submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Letting you in...' : 'Login'}
             </Button>
             <p className="mt-4" style={{padding: '0', margin: '0'}}>Create new account <Link to={"/signup"}>Signup</Link></p>
           </form>
