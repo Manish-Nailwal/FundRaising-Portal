@@ -39,9 +39,9 @@ function NavBar() {
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top">
-        <div className="container-fluid px-5">
-          <Link className="navbar-brand" to="/">
-            LoGO
+        <div className="container-fluid px-5 ">
+          <Link className="d-flex align-items-center" to="/">
+            <img src="/media/textLogo.png" alt="" height={'20px'}/>
           </Link>
           <button
             className="navbar-toggler"
