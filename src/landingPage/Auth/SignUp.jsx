@@ -147,7 +147,7 @@ function SignUp() {
               onChange={updateData}
               required
             />
-            <Button variant="contained" className="col-2 mt-4" type="Submit">
+            <Button variant="contained" className="col-2 mt-4  px-2" type="Submit" style={{minWidth: "fit-content"}}>
             {isSubmitting ? 'Getting you set up...' : 'Create Account'}
             </Button>
             <p className="mt-4" style={{ padding: "0", margin: "0" }}>
