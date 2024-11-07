@@ -39,9 +39,9 @@ function NavBar() {
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top">
-        <div className="container-fluid px-5 ">
-          <Link className="d-flex align-items-center" to="/">
-            <img src="/media/textLogo.png" alt="" height={'20px'}/>
+        <div className="container-fluid pe-5 ">
+          <Link className="" to="/">
+            <img src="/media/textLogo.png" alt="" height={'23px'}/>
           </Link>
           <button
             className="navbar-toggler"
@@ -56,7 +56,7 @@ function NavBar() {
           </button>
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav">
-              <Link className="nav-link active" aria-current="page" to="/">
+              <Link className="nav-link " aria-current="page" to="/">
                 Dashboard
               </Link>
               {isLogin && (
